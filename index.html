@@ -7,11 +7,11 @@
 <style>
 :root{color-scheme:dark;--bg:#10151b;--panel:#18212a;--line:#303d49;--text:#edf3f8;--muted:#a4b2bf;--gold:#f4c34f;--green:#71d7a0}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,sans-serif}header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 15px;background:#121920;border-bottom:1px solid var(--line)}h1{font-size:17px;line-height:1.25;margin:0}header p{font-size:12px;color:var(--muted);margin:4px 0 0}.pill{font-size:10px;color:#191919;background:var(--gold);padding:5px 8px;border-radius:99px;font-weight:800;white-space:nowrap}main{display:grid;grid-template-columns:310px 1fr;height:calc(100dvh - 65px)}aside{overflow:auto;padding:14px;background:var(--panel);border-right:1px solid var(--line)}.label{display:block;font-size:12px;color:var(--muted);margin:12px 0 6px}input,select,button{width:100%;border:1px solid var(--line);border-radius:9px;background:#10171e;color:var(--text);font:inherit;padding:10px}button{cursor:pointer}button:active{transform:scale(.99)}.modes{display:grid;grid-template-columns:1fr 1fr;gap:7px}.modes button.active{background:var(--gold);color:#171717;border-color:var(--gold);font-weight:800}.tools{display:flex;gap:7px;margin:9px 0}.tools button{font-size:12px;padding:8px}.category{display:flex;align-items:center;gap:8px;padding:9px 2px;border-bottom:1px solid #26313b;font-size:13px}.category input{width:auto;accent-color:var(--gold)}.category .swatch{width:10px;height:10px;border-radius:50%;display:inline-block}.category span:nth-child(3){flex:1}.small{font-size:11px;color:var(--muted)}.note{font-size:11px;line-height:1.45;color:#f2dba0;background:#2a261b;border:1px solid #5b4b27;padding:10px;border-radius:9px;margin-top:14px}#map{height:100%;width:100%;background:#253a35}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#18212a;color:var(--text)}.leaflet-popup-content{font-size:13px}.popupbutton{margin-top:8px;padding:6px}.found{color:var(--green);font-weight:700}.status{font-size:12px;color:var(--muted);margin-top:8px}.results{display:grid;gap:5px;margin-top:7px;max-height:150px;overflow:auto}.result{display:block;text-align:left;font-size:12px;padding:8px 9px;background:#111a22;border:1px solid #2d3b47}.result b{display:block}.result small{color:var(--muted)}.footer{font-size:10px;color:var(--muted);line-height:1.4;margin-top:12px}.leaflet-control-attribution{font-size:9px!important}@media(max-width:700px){main{grid-template-columns:1fr;grid-template-rows:auto 1fr;height:calc(100dvh - 62px)}aside{max-height:44dvh;border-right:0;border-bottom:1px solid var(--line);padding:10px 12px}.categorylist{display:grid;grid-template-columns:1fr 1fr;column-gap:10px}.note{margin-top:9px}#map{min-height:45dvh}header{padding:10px 12px}}
 </style></head><body>
-<header><div><h1>🗺️ MAPA GTA V — PORTUGUÊS DE PORTUGAL</h1><p>Los Santos e Blaine County · modo história e GTA Online</p></div><span class="pill">VERSÃO 4 · POSIÇÕES CALIBRADAS</span></header>
+<header><div><h1>🗺️ MAPA GTA V — PORTUGUÊS DE PORTUGAL</h1><p>Los Santos e Blaine County · modo história e GTA Online</p></div><span class="pill">VERSÃO 5 · COORDENADAS ALINHADAS</span></header>
 <main><aside><span class="label">Modo de jogo</span><div class="modes"><button class="active" data-mode="historia">Modo história</button><button data-mode="online">GTA Online</button></div>
 <label class="label" for="search">Pesquisar local ou categoria</label><input id="search" placeholder="Ex.: Vinewood, aeroporto, lojas…" autocomplete="off"><div id="searchStatus" class="status">A carregar locais…</div><div id="results" class="results" aria-live="polite"></div>
 <label class="label" for="categoryFilter">Categoria</label><select id="categoryFilter"><option value="todas">Todas as categorias</option></select><div class="tools"><button id="all">Mostrar todas</button><button id="none">Ocultar todas</button></div><div id="categorylist" class="categorylist"></div>
-<div class="note"><b>Importante:</b> Os nomes são locais do jogo. Esta versão usa uma conversão calibrada para alinhar os marcadores com o mapa. Algumas referências continuam aproximadas; locais conhecidos foram corrigidos. Os pontos de interesse completos (armas, colecionáveis e eventos) ainda terão de ser integrados por conjuntos de dados específicos.</div><div class="footer">O progresso fica guardado neste navegador. Projeto de fãs, não oficial nem afiliado à Rockstar Games. Mapa-base comunitário.</div></aside><div id="map" aria-label="Mapa interativo do GTA V"></div></main>
+<div class="note"><b>Importante:</b> Os nomes são locais do jogo. O sistema de coordenadas foi alinhado com os mosaicos do mapa. Algumas referências continuam aproximadas e serão afinadas progressivamente. Os pontos de interesse completos (armas, colecionáveis e eventos) ainda terão de ser integrados por conjuntos de dados específicos.</div><div class="footer">O progresso fica guardado neste navegador. Projeto de fãs, não oficial nem afiliado à Rockstar Games. Mapa-base comunitário.</div></aside><div id="map" aria-label="Mapa interativo do GTA V"></div></main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script>
 const cats=[
 {id:'locais',name:'Bairros e locais',color:'#5dc8ff'},
@@ -81,15 +81,29 @@ const pts=[
 {id:'vespucci-mask',name:'Máscaras — Vespucci',cat:'servicos',mode:'ambos',xy:[2900,5500],desc:'Loja de máscaras na zona costeira. Posição aproximada.'},
 {id:'casino-race',name:'Vinewood Park / zona do casino',cat:'online',mode:'online',xy:[5200,4550],desc:'Referência de zona do GTA Online; não indica um evento temporário atual.'}
 ];
-// Calibração do mapa: mosaicos 8192x8192 px alinhados com coordenadas do mundo GTA.
-const CRS=L.extend({},L.CRS.Simple,{transformation:new L.Transformation(0.02072,117.3,-0.0205,172.8)});
+// CRS correto: coordenadas do mundo GTA alinhadas com os mosaicos Atlas 8192x8192.
+const CRS=L.extend({},L.CRS.Simple,{
+  projection:L.Projection.LonLat,
+  scale:z=>Math.pow(2,z),
+  zoom:s=>Math.log(s)/Math.LN2,
+  transformation:new L.Transformation(0.02072,117.3,-0.0205,172.8),
+  infinite:true
+});
 const map=L.map('map',{crs:CRS,minZoom:0,maxZoom:5,zoomControl:true,attributionControl:true});
 const mapBounds=[[-3867,-5659],[8439,6680]];
 L.tileLayer('https://viruxe.github.io/gtav-map-tiles/atlas/{z}/{x}-{y}.webp',{minZoom:0,maxZoom:5,noWrap:true,bounds:mapBounds,attribution:'Mapa-base comunitário GTA V'}).addTo(map);
-// As referências antigas estão em pixels aproximados; converter para coordenadas GTA.
-// Os locais conhecidos abaixo usam coordenadas de jogo publicadas.
-const calibrated={'paleto':[-134,6356],'paleto-forest':[-500,6000],'sandy':[1850,3685],'grapeseed':[1700,4800],'downtown':[215,-810],'legion-square':[215,-810],'mission-row':[425,-979],'davis':[-48,-1757]};
-const pointLatLng=p=>{if(calibrated[p.id])return[calibrated[p.id][1],calibrated[p.id][0]];const px=p.xy[0],py=p.xy[1];const x=((px/32)-117.3)/0.02072;const y=(172.8-(py/32))/0.0205;return[y,x];};
+// Coordenadas reais para locais de referência; os restantes pontos continuam aproximados.
+const calibrated={
+  'paleto':[-134,6356], 'paleto-forest':[-500,6000], 'mount-chiliad':[450,6000],
+  'sandy':[1850,3685], 'sandy-airfield':[1700,3500], 'grapeseed':[1700,4800],
+  'downtown':[215,-810], 'legion-square':[215,-810], 'mission-row':[425,-979], 'davis':[-48,-1757]
+};
+const pointLatLng=p=>{
+  let x,y;
+  if(calibrated[p.id]){[x,y]=calibrated[p.id];}
+  else {const px=p.xy[0],py=p.xy[1];x=((px/32)-117.3)/0.02072;y=(172.8-(py/32))/0.0205;}
+  return [y,x];
+};
 map.fitBounds(mapBounds);
 const getFound=()=>{try{return JSON.parse(localStorage.getItem('gta-pt-found')||'[]')}catch(e){return[]}};let found=new Set(getFound()),mode='historia',enabled=new Set(cats.map(c=>c.id)),layers=new Map();const $=s=>document.querySelector(s);
 cats.forEach(c=>{let o=document.createElement('option');o.value=c.id;o.textContent=c.name;$('#categoryFilter').append(o);let lab=document.createElement('label');lab.className='category';lab.innerHTML=`<input type="checkbox" checked data-cat="${c.id}"><i class="swatch" style="background:${c.color}"></i><span>${c.name}</span>`;$('#categorylist').append(lab)});
