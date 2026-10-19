@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mapa GTA — PT-PT</title>
+<style>
+:root{--bg:#10151b;--panel:#19212a;--line:#2d3946;--text:#edf3f8;--muted:#9eafbd;--gold:#f4c34f;--green:#73d6a0}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,sans-serif}
+header{padding:16px 18px;background:#121920;border-bottom:1px solid var(--line);display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+h1{font-size:20px;margin:0}header p{margin:4px 0 0;color:var(--muted);font-size:13px}
+main{display:grid;grid-template-columns:310px 1fr;min-height:calc(100vh - 75px)}
+aside{background:var(--panel);border-right:1px solid var(--line);padding:16px;overflow:auto}
+label,.label{display:block;font-size:12px;color:var(--muted);margin:13px 0 6px}
+input,select,button{font:inherit;color:var(--text);background:#111820;border:1px solid var(--line);border-radius:9px;padding:10px;width:100%}
+button{cursor:pointer}button:hover{border-color:var(--gold)}.modes{display:grid;grid-template-columns:1fr 1fr;gap:8px}.modes button.active{background:var(--gold);color:#171717;border-color:var(--gold);font-weight:700}
+.rowbtn{display:flex;gap:8px;margin:10px 0}.rowbtn button{font-size:12px;padding:8px}
+.cat{display:flex;gap:9px;align-items:center;padding:8px 4px;border-bottom:1px solid #26313c}.cat input{width:auto;accent-color:var(--gold)}.cat span{flex:1}.count{font-size:11px;color:var(--muted)}
+.note{margin-top:15px;padding:11px;border:1px solid #5a4b27;background:#29251a;border-radius:9px;color:#f0dca2;font-size:12px;line-height:1.45}
+#mapwrap{position:relative;min-height:620px;overflow:hidden;background:#1a2b2b}
+#map{width:100%;height:100%;min-height:620px;display:block;touch-action:pan-y}
+.maplabel{font-size:18px;fill:#e7e4ce;letter-spacing:2px;font-weight:700;opacity:.8}.smalllabel{font-size:11px;fill:#c4d1c5;opacity:.8}
+.marker{cursor:pointer;stroke:#121820;stroke-width:2}.marker.done{opacity:.38}.marker:focus{outline:none;stroke:white;stroke-width:4}
+.mapcontrols{position:absolute;right:14px;top:14px;display:flex;flex-direction:column;gap:6px;width:45px}.mapcontrols button{padding:8px;font-size:20px;background:#101820dd}
+#details{position:absolute;bottom:14px;left:14px;right:70px;max-width:470px;background:#111820ed;border:1px solid var(--line);border-radius:12px;padding:13px;display:none}
+#details h3{margin:0 0 5px;font-size:16px}#details p{margin:0;color:var(--muted);font-size:13px;line-height:1.4}
+.status{color:var(--green);font-size:12px;margin-top:8px}.foot{color:var(--muted);font-size:11px;margin-top:15px;line-height:1.4}
+@media(max-width:760px){main{grid-template-columns:1fr}aside{border-right:0;border-bottom:1px solid var(--line)}#mapwrap,#map{min-height:56vh}.catlist{display:grid;grid-template-columns:1fr 1fr;gap:0}.note{margin-bottom:8px}}
+</style>
+</head>
+<body>
+<header><div><h1>🗺️ MAPA GTA — PORTUGUÊS DE PORTUGAL</h1><p>Protótipo interativo · GTA V e GTA Online</p></div><div style="font-size:12px;color:#f4c34f">PROTÓTIPO · localizações de demonstração</div></header>
+<main>
+<aside>
+<div class="label">Modo de jogo</div><div class="modes"><button class="active" data-mode="historia">Modo história</button><button data-mode="online">GTA Online</button></div>
+<label for="search">Procurar local ou marcador</label><input id="search" placeholder="Ex.: aeroporto, armas, cartas…">
+<label for="group">Filtrar por categoria</label><select id="group"><option value="todas">Todas as categorias</option></select>
+<div class="rowbtn"><button id="showall">Mostrar tudo</button><button id="hideall">Ocultar tudo</button></div>
+<div id="catlist" class="catlist"></div>
+<div class="note"><b>Nota importante:</b> esta versão demonstra a interface, os filtros e o registo de progresso. Os pontos no mapa são ilustrativos, não localizações exatas do jogo. A versão completa precisa de uma base cartográfica GTA e de dados verificados.</div>
+<div class="foot">O progresso fica guardado neste navegador. Projeto de fãs, não oficial nem afiliado à Rockstar Games.</div>
+</aside>
+<section id="mapwrap" aria-label="Mapa interativo">
+<svg id="map" viewBox="0 0 1000 800" role="img" aria-label="Mapa esquemático ilustrativo de Los Santos">
+<defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#314541" stroke-width="1"/></pattern></defs>
+<rect width="1000" height="800" fill="#203a37"/><rect width="1000" height="800" fill="url(#grid)"/>
+<path d="M0 590 Q130 550 210 620 T430 700 T650 640 T1000 700 L1000 800 L0 800Z" fill="#23536a"/>
+<path d="M80 0 Q180 130 120 240 T190 430 T140 600" fill="none" stroke="#31534c" stroke-width="65"/>
+<path d="M300 -20 L350 180 L280 320 L390 480 L340 620 L450 800 M700 -20 L640 160 L730 280 L650 430 L740 560 L690 820 M-20 300 L250 330 L450 280 L650 330 L1020 270 M-20 500 L220 470 L440 520 L700 480 L1020 530" fill="none" stroke="#b3a985" stroke-width="12" opacity=".7"/>
+<path d="M-20 300 L250 330 L450 280 L650 330 L1020 270 M-20 500 L220 470 L440 520 L700 480 L1020 530" fill="none" stroke="#d7cba4" stroke-width="3" opacity=".8"/>
+<path d="M520 0 L480 180 L530 330 L490 490 L540 650 L520 800 M0 150 L300 180 L520 130 L800 170 L1000 130 M0 400 L250 390 L500 420 L800 390 L1000 410" fill="none" stroke="#788d78" stroke-width="4" opacity=".8"/>
+<g class="maplabel"><text x="370" y="380">LOS SANTOS</text><text x="90" y="120" font-size="14">VINEWOOD HILLS</text><text x="700" y="170" font-size="14">BLAINE COUNTY</text><text x="270" y="680" font-size="14">OCEANO PACÍFICO</text></g>
+<g class="smalllabel"><text x="385" y="410">Centro da cidade</text><text x="745" y="205">Zona rural</text><text x="80" y="620">Costa</text></g>
+<g id="markers"></g>
+</svg>
+<div class="mapcontrols"><button id="zoomIn" aria-label="Ampliar">+</button><button id="zoomOut" aria-label="Reduzir">−</button><button id="reset" aria-label="Repor mapa">⌂</button></div>
+<div id="details"><h3></h3><p></p><div class="status"></div><button id="markdone" style="margin-top:10px">Marcar como encontrado</button></div>
+</section>
+</main>
+<script>
+const categories=[
+{id:'armas',name:'Armas e equipamento',color:'#ff6b6b'},
+{id:'veiculos',name:'Veículos',color:'#f5a742'},
+{id:'colecionaveis',name:'Colecionáveis',color:'#65c8ff'},
+{id:'atividades',name:'Atividades e desafios',color:'#c59cff'},
+{id:'segredos',name:'Segredos e easter eggs',color:'#f4d35e'},
+{id:'servicos',name:'Lojas e serviços',color:'#73d6a0'},
+{id:'online',name:'Locais do GTA Online',color:'#ff86c8'},
+{id:'missoes',name:'Missões e eventos',color:'#d6e2ed'}
+];
+const points=[
+{id:1,name:'Aeroporto Internacional de Los Santos',cat:'veiculos',mode:'ambos',x:330,y:565,desc:'Ponto ilustrativo para demonstrar a seleção de locais.'},
+{id:2,name:'Centro de Los Santos',cat:'servicos',mode:'ambos',x:450,y:385,desc:'Área urbana ilustrativa. A localização exata será ligada à cartografia verificada.'},
+{id:3,name:'Vinewood Hills',cat:'segredos',mode:'historia',x:380,y:210,desc:'Zona de demonstração para a categoria de segredos.'},
+{id:4,name:'Zona de Blaine County',cat:'atividades',mode:'ambos',x:720,y:220,desc:'Área de demonstração para atividades e desafios.'},
+{id:5,name:'Costa de Los Santos',cat:'colecionaveis',mode:'historia',x:210,y:620,desc:'Ponto de demonstração para colecionáveis.'},
+{id:6,name:'Local de encontro — exemplo',cat:'online',mode:'online',x:610,y:450,desc:'Marcador ilustrativo exclusivo do modo GTA Online.'},
+{id:7,name:'Ponto de equipamento — exemplo',cat:'armas',mode:'ambos',x:535,y:340,desc:'Marcador ilustrativo para armas e equipamento.'},
+{id:8,name:'Ponto de veículo — exemplo',cat:'veiculos',mode:'online',x:760,y:470,desc:'Marcador ilustrativo para veículos.'},
+{id:9,name:'Evento — exemplo',cat:'missoes',mode:'historia',x:270,y:300,desc:'Marcador ilustrativo para missões e eventos.'}
+];
+let mode='historia', enabled=new Set(categories.map(c=>c.id)), selected=null, zoom=1, panX=0, panY=0;
+const done=new Set(JSON.parse(localStorage.getItem('gta-pt-done')||'[]'));
+const $=s=>document.querySelector(s);
+categories.forEach(c=>{let o=document.createElement('option');o.value=c.id;o.textContent=c.name;$('#group').append(o);
+let l=document.createElement('label');l.className='cat';l.innerHTML=`<input type="checkbox" checked data-cat="${c.id}"><span>${c.name}</span><small class="count" id="count-${c.id}"></small>`;$('#catlist').append(l)});
+function visible(p){return (p.mode==='ambos'||p.mode===mode)&&enabled.has(p.cat)&&(`${p.name} ${p.desc} ${categories.find(c=>c.id===p.cat).name}`.toLowerCase().includes($('#search').value.toLowerCase()))&&($('#group').value==='todas'||$('#group').value===p.cat)}
+function render(){
+ const root=$('#markers');root.innerHTML='';
+ points.filter(visible).forEach(p=>{const c=categories.find(c=>c.id===p.cat),g=document.createElementNS('http://www.w3.org/2000/svg','g');g.setAttribute('transform',`translate(${p.x} ${p.y})`);g.setAttribute('tabindex','0');g.setAttribute('role','button');g.setAttribute('aria-label',p.name);
+ const circ=document.createElementNS('http://www.w3.org/2000/svg','circle');circ.setAttribute('r',done.has(p.id)?9:12);circ.setAttribute('fill',c.color);circ.setAttribute('class','marker'+(done.has(p.id)?' done':''));g.append(circ);
+ const t=document.createElementNS('http://www.w3.org/2000/svg','text');t.textContent=done.has(p.id)?'✓':c.name[0];t.setAttribute('text-anchor','middle');t.setAttribute('dy','.35em');t.setAttribute('font-size','11');t.setAttribute('font-weight','bold');t.setAttribute('fill','#111820');t.style.pointerEvents='none';g.append(t);
+ g.addEventListener('click',()=>select(p));g.addEventListener('keydown',e=>{if(e.key==='Enter')select(p)});root.append(g)});
+ categories.forEach(c=>{$('#count-'+c.id).textContent=points.filter(p=>p.cat===c.id&&(p.mode==='ambos'||p.mode===mode)).length});
+}
+function select(p){selected=p;const d=$('#details');d.style.display='block';d.querySelector('h3').textContent=p.name;d.querySelector('p').textContent=p.desc;d.querySelector('.status').textContent=done.has(p.id)?'✓ Marcado como encontrado':'Ainda não encontrado';$('#markdone').textContent=done.has(p.id)?'Retirar marcação':'Marcar como encontrado'}
+document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;document.querySelectorAll('[data-mode]').forEach(x=>x.classList.toggle('active',x===b));render();$('#details').style.display='none'});
+$('#search').addEventListener('input',render);$('#group').addEventListener('change',render);
+document.querySelectorAll('[data-cat]').forEach(i=>i.onchange=()=>{i.checked?enabled.add(i.dataset.cat):enabled.delete(i.dataset.cat);render()});
+$('#showall').onclick=()=>{enabled=new Set(categories.map(c=>c.id));document.querySelectorAll('[data-cat]').forEach(i=>i.checked=true);render()};
+$('#hideall').onclick=()=>{enabled.clear();document.querySelectorAll('[data-cat]').forEach(i=>i.checked=false);render()};
+$('#markdone').onclick=()=>{if(!selected)return;done.has(selected.id)?done.delete(selected.id):done.add(selected.id);localStorage.setItem('gta-pt-done',JSON.stringify([...done]));select(selected);render()};
+function applyView(){ $('#markers').setAttribute('transform',`translate(${panX} ${panY}) translate(500 400) scale(${zoom}) translate(-500 -400)`)}
+$('#zoomIn').onclick=()=>{zoom=Math.min(2.4,zoom*1.2);applyView()};$('#zoomOut').onclick=()=>{zoom=Math.max(.7,zoom/1.2);applyView()};$('#reset').onclick=()=>{zoom=1;panX=panY=0;applyView()};
+render();
+</script>
+</body></html>
