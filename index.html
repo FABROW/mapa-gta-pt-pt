@@ -81,6 +81,8 @@ const pts=[
 {id:'vespucci-mask',name:'Máscaras — Vespucci',cat:'servicos',mode:'ambos',xy:[2900,5500],desc:'Loja de máscaras na zona costeira. Posição aproximada.'},
 {id:'casino-race',name:'Vinewood Park / zona do casino',cat:'online',mode:'online',xy:[5200,4550],desc:'Referência de zona do GTA Online; não indica um evento temporário atual.'}
 ];
+// As coordenadas dos pontos estão no formato [x,y] da imagem; Leaflet/CRS.Simple usa [y,x] com o eixo vertical invertido.
+const pointLatLng=p=>[8192-p.xy[1],p.xy[0]];
 // A cartografia publicada usa mosaicos XYZ e CRS.Simple com transformação 1/32.
 const CRS=L.extend({},L.CRS.Simple,{transformation:new L.Transformation(1/32,0,1/32,0)});
 const map=L.map('map',{crs:CRS,minZoom:0,maxZoom:5,zoomControl:true,attributionControl:true});
@@ -92,12 +94,12 @@ function matches(p){return(p.mode==='ambos'||p.mode===mode)&&enabled.has(p.cat)&
 function draw(){
  layers.forEach(l=>map.removeLayer(l));layers.clear();
  const foundPts=pts.filter(matches);
- foundPts.forEach(p=>{const c=cats.find(x=>x.id===p.cat),icon=L.divIcon({className:'',html:`<div style="width:25px;height:25px;border:2px solid #10151b;border-radius:50%;background:${c.color};display:grid;place-items:center;color:#10151b;font-weight:900;box-shadow:0 1px 5px #0009">${found.has(p.id)?'✓':c.name[0]}</div>`,iconSize:[25,25],iconAnchor:[12,12]});let m=L.marker([p.xy[0],p.xy[1]],{icon}).addTo(map);m.bindPopup(`<b>${p.name}</b><br><span style="color:#a4b2bf">${c.name}</span><p>${p.desc}</p><span class="${found.has(p.id)?'found':''}">${found.has(p.id)?'✓ Marcado como encontrado':'Ainda não encontrado'}</span><br><button class="popupbutton" onclick="toggleFound('${p.id}')">${found.has(p.id)?'Retirar marcação':'Marcar como encontrado'}</button>`);layers.set(p.id,m)});
+ foundPts.forEach(p=>{const c=cats.find(x=>x.id===p.cat),icon=L.divIcon({className:'',html:`<div style="width:25px;height:25px;border:2px solid #10151b;border-radius:50%;background:${c.color};display:grid;place-items:center;color:#10151b;font-weight:900;box-shadow:0 1px 5px #0009">${found.has(p.id)?'✓':c.name[0]}</div>`,iconSize:[25,25],iconAnchor:[12,12]});let m=L.marker(pointLatLng(p),{icon}).addTo(map);m.bindPopup(`<b>${p.name}</b><br><span style="color:#a4b2bf">${c.name}</span><p>${p.desc}</p><span class="${found.has(p.id)?'found':''}">${found.has(p.id)?'✓ Marcado como encontrado':'Ainda não encontrado'}</span><br><button class="popupbutton" onclick="toggleFound('${p.id}')">${found.has(p.id)?'Retirar marcação':'Marcar como encontrado'}</button>`);layers.set(p.id,m)});
  $('#searchStatus').textContent=`Resultados: ${foundPts.length} de ${pts.length} referências`;
  const box=$('#results');box.innerHTML='';
- foundPts.slice(0,12).forEach(p=>{const c=cats.find(x=>x.id===p.cat),b=document.createElement('button');b.className='result';b.innerHTML=`<b>${p.name}</b><small>${c.name} · posição aproximada</small>`;b.onclick=()=>{const m=layers.get(p.id);if(m){map.setView([p.xy[0],p.xy[1]],Math.max(map.getZoom(),3));m.openPopup();}};box.append(b)});
+ foundPts.slice(0,12).forEach(p=>{const c=cats.find(x=>x.id===p.cat),b=document.createElement('button');b.className='result';b.innerHTML=`<b>${p.name}</b><small>${c.name} · posição aproximada</small>`;b.onclick=()=>{const m=layers.get(p.id);if(m){map.setView(pointLatLng(p),Math.max(map.getZoom(),3));m.openPopup();}};box.append(b)});
  if(foundPts.length>12){const more=document.createElement('div');more.className='small';more.textContent=`A mostrar os primeiros 12 resultados de ${foundPts.length}. Refina a pesquisa para reduzir a lista.`;box.append(more)}
 }window.toggleFound=id=>{found.has(id)?found.delete(id):found.add(id);localStorage.setItem('gta-pt-found',JSON.stringify([...found]));draw()};document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;document.querySelectorAll('[data-mode]').forEach(x=>x.classList.toggle('active',x===b));draw()});$('#search').addEventListener('input',draw);$('#categoryFilter').addEventListener('change',draw);document.querySelectorAll('[data-cat]').forEach(i=>i.onchange=()=>{i.checked?enabled.add(i.dataset.cat):enabled.delete(i.dataset.cat);draw()});$('#all').onclick=()=>{enabled=new Set(cats.map(c=>c.id));document.querySelectorAll('[data-cat]').forEach(i=>i.checked=true);draw()};$('#none').onclick=()=>{enabled.clear();document.querySelectorAll('[data-cat]').forEach(i=>i.checked=false);draw()};
 // Pesquisa por nome centra no ponto correspondente quando há um único resultado.
-$('#search').addEventListener('change',()=>{const r=pts.filter(matches);if(r.length===1){map.setView([r[0].xy[0],r[0].xy[1]],3);layers.get(r[0].id)?.openPopup()}});draw();
+$('#search').addEventListener('change',()=>{const r=pts.filter(matches);if(r.length===1){map.setView(pointLatLng(r[0]),3);layers.get(r[0].id)?.openPopup()}});draw();
 </script></body></html>
