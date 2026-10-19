@@ -81,50 +81,35 @@ const pts=[
 {id:'vespucci-mask',name:'Máscaras — Vespucci',cat:'servicos',mode:'ambos',xy:[2900,5500],desc:'Loja de máscaras na zona costeira. Posição aproximada.'},
 {id:'casino-race',name:'Vinewood Park / zona do casino',cat:'online',mode:'online',xy:[5200,4550],desc:'Referência de zona do GTA Online; não indica um evento temporário atual.'}
 ];
-// CRS correto: coordenadas do mundo GTA alinhadas com os mosaicos Atlas 8192x8192.
+// Cartografia comunitária em tiles 8192x8192, com 32x32 tiles no zoom 5.
+// CRS.Simple mantém o mapa no plano de píxeis usado pelos tiles.
 const CRS=L.extend({},L.CRS.Simple,{
-  projection:L.Projection.LonLat,
-  scale:z=>Math.pow(2,z),
-  zoom:s=>Math.log(s)/Math.LN2,
-  transformation:new L.Transformation(0.02072,117.3,-0.0205,172.8),
-  infinite:true
+  transformation:new L.Transformation(1/32,0,1/32,0)
 });
 const map=L.map('map',{crs:CRS,minZoom:0,maxZoom:5,zoomControl:true,attributionControl:true,zoomSnap:0.5});
-const mapBounds=[[-3867,-5659],[8439,6680]];
-const tileOptions={minZoom:0,maxZoom:5,noWrap:true,bounds:mapBounds,attribution:'Mapa-base comunitário GTA V'};
+const mapBounds=[[0,0],[8192,8192]];
+const tileOptions={minZoom:0,maxZoom:5,noWrap:true,bounds:mapBounds,attribution:'Cartografia comunitária GTA V · tiles por VIRUXE'};
 const atlas=L.tileLayer('https://viruxe.github.io/gtav-map-tiles/atlas/{z}/{x}-{y}.webp',tileOptions).addTo(map);
 const satelite=L.tileLayer('https://viruxe.github.io/gtav-map-tiles/satelite/{z}/{x}-{y}.webp',tileOptions);
 L.control.layers({'Mapa de ruas':atlas,'Satélite':satelite},null,{position:'topright',collapsed:true}).addTo(map);
-// Coordenadas reais para locais de referência; os restantes pontos continuam aproximados.
+// Coordenadas aproximadas do mapa em píxeis. Para pontos calibrados, convertemos
+// coordenadas do mundo GTA para o plano de píxeis da cartografia.
 const calibrated={
-  // Coordenadas do mundo GTA V (x, y); selecionadas a partir de referências públicas.
-  'vinewood-sign':[710,1200],
-  'airport':[-1035,-2735],
-  'sandy':[1850,3685],
-  'paleto':[-134,6356],
-  'grapeseed':[1700,4800],
-  'vespucci':[-1300,-1600],
-  'del-perro':[-1650,-1033],
-  'downtown':[215,-810],
-  'fort-zancudo':[-2047,3132],
-  'observatory':[-438,1076],
-  'mount-chiliad':[450.718,5566.614],
-  'paleto-forest':[-500,6000],
-  'sandy-airfield':[1700,3500],
-  'alamo-sea':[1300,3000],
-  'lighthouse': [3330,5170],
-  'humane-labs':[3500,3600],
-  'davis':[-48,-1757],
-  'mission-row':[425,-979],
-  'legion-square':[195,-935],
-  'ls-customs-airport':[-1035,-2735],
+  'vinewood-sign':[710,1200], 'airport':[-1035,-2735], 'sandy':[1850,3685],
+  'paleto':[-134,6356], 'grapeseed':[1700,4800], 'vespucci':[-1300,-1600],
+  'del-perro':[-1650,-1033], 'downtown':[215,-810], 'fort-zancudo':[-2047,3132],
+  'observatory':[-438,1076], 'mount-chiliad':[450.718,5566.614],
+  'paleto-forest':[-500,6000], 'sandy-airfield':[1700,3500], 'alamo-sea':[1300,3000],
+  'lighthouse':[3330,5170], 'humane-labs':[3500,3600], 'davis':[-48,-1757],
+  'mission-row':[425,-979], 'legion-square':[195,-935], 'ls-customs-airport':[-1035,-2735],
   'ls-customs-la-mesa':[843,-1028]
 };
 const pointLatLng=p=>{
-  let x,y;
-  if(calibrated[p.id]){[x,y]=calibrated[p.id];}
-  else {const px=p.xy[0],py=p.xy[1];x=(px-(117.3*32))/(0.02072*32);y=((172.8*32)-py)/(0.0205*32);}
-  return [y,x];
+  if(calibrated[p.id]){
+    const [x,y]=calibrated[p.id];
+    return [5529-0.656*y,3753+0.663*x];
+  }
+  return [p.xy[1],p.xy[0]];
 };
 map.fitBounds(mapBounds);
 map.on('popupopen',e=>{const popup=e.popup;setTimeout(()=>map.panInside(popup.getLatLng(),{paddingTopLeft:[25,95],paddingBottomRight:[25,95]}),50)});
