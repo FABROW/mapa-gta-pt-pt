@@ -7,11 +7,11 @@
 <style>
 :root{color-scheme:dark;--bg:#10151b;--panel:#18212a;--line:#303d49;--text:#edf3f8;--muted:#a4b2bf;--gold:#f4c34f;--green:#71d7a0}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,sans-serif}header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 15px;background:#121920;border-bottom:1px solid var(--line)}h1{font-size:17px;line-height:1.25;margin:0}header p{font-size:12px;color:var(--muted);margin:4px 0 0}.pill{font-size:10px;color:#191919;background:var(--gold);padding:5px 8px;border-radius:99px;font-weight:800;white-space:nowrap}main{display:grid;grid-template-columns:310px 1fr;height:calc(100dvh - 65px)}aside{overflow:auto;padding:14px;background:var(--panel);border-right:1px solid var(--line)}.label{display:block;font-size:12px;color:var(--muted);margin:12px 0 6px}input,select,button{width:100%;border:1px solid var(--line);border-radius:9px;background:#10171e;color:var(--text);font:inherit;padding:10px}button{cursor:pointer}button:active{transform:scale(.99)}.modes{display:grid;grid-template-columns:1fr 1fr;gap:7px}.modes button.active{background:var(--gold);color:#171717;border-color:var(--gold);font-weight:800}.tools{display:flex;gap:7px;margin:9px 0}.tools button{font-size:12px;padding:8px}.category{display:flex;align-items:center;gap:8px;padding:9px 2px;border-bottom:1px solid #26313b;font-size:13px}.category input{width:auto;accent-color:var(--gold)}.category .swatch{width:10px;height:10px;border-radius:50%;display:inline-block}.category span:nth-child(3){flex:1}.small{font-size:11px;color:var(--muted)}.note{font-size:11px;line-height:1.45;color:#f2dba0;background:#2a261b;border:1px solid #5b4b27;padding:10px;border-radius:9px;margin-top:14px}#map{height:100%;width:100%;background:#253a35}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#18212a;color:var(--text)}.leaflet-popup-content{font-size:13px}.popupbutton{margin-top:8px;padding:6px}.found{color:var(--green);font-weight:700}.status{font-size:12px;color:var(--muted);margin-top:8px}.results{display:grid;gap:5px;margin-top:7px;max-height:150px;overflow:auto}.result{display:block;text-align:left;font-size:12px;padding:8px 9px;background:#111a22;border:1px solid #2d3b47}.result b{display:block}.result small{color:var(--muted)}.footer{font-size:10px;color:var(--muted);line-height:1.4;margin-top:12px}.leaflet-control-attribution{font-size:9px!important}@media(max-width:700px){main{grid-template-columns:1fr;grid-template-rows:auto 1fr;height:calc(100dvh - 62px)}aside{max-height:44dvh;border-right:0;border-bottom:1px solid var(--line);padding:10px 12px}.categorylist{display:grid;grid-template-columns:1fr 1fr;column-gap:10px}.note{margin-top:9px}#map{min-height:45dvh}header{padding:10px 12px}}
 </style></head><body>
-<header><div><h1>🗺️ MAPA GTA V — PORTUGUÊS DE PORTUGAL</h1><p>Los Santos e Blaine County · modo história e GTA Online</p></div><span class="pill">VERSÃO 5 · COORDENADAS ALINHADAS</span></header>
+<header><div><h1>🗺️ MAPA GTA V — PORTUGUÊS DE PORTUGAL</h1><p>Los Santos e Blaine County · modo história e GTA Online</p></div><span class="pill">VERSÃO 6 · COORDENADAS REVISTAS</span></header>
 <main><aside><span class="label">Modo de jogo</span><div class="modes"><button class="active" data-mode="historia">Modo história</button><button data-mode="online">GTA Online</button></div>
 <label class="label" for="search">Pesquisar local ou categoria</label><input id="search" placeholder="Ex.: Vinewood, aeroporto, lojas…" autocomplete="off"><div id="searchStatus" class="status">A carregar locais…</div><div id="results" class="results" aria-live="polite"></div>
 <label class="label" for="categoryFilter">Categoria</label><select id="categoryFilter"><option value="todas">Todas as categorias</option></select><div class="tools"><button id="all">Mostrar todas</button><button id="none">Ocultar todas</button></div><div id="categorylist" class="categorylist"></div>
-<div class="note"><b>Importante:</b> Os nomes são locais do jogo. O sistema de coordenadas foi alinhado com os mosaicos do mapa. Algumas referências continuam aproximadas e serão afinadas progressivamente. Os pontos de interesse completos (armas, colecionáveis e eventos) ainda terão de ser integrados por conjuntos de dados específicos.</div><div class="footer">O progresso fica guardado neste navegador. Projeto de fãs, não oficial nem afiliado à Rockstar Games. Mapa-base comunitário.</div></aside><div id="map" aria-label="Mapa interativo do GTA V"></div></main>
+<div class="note"><b>Importante:</b> Os nomes são locais do jogo. O sistema de coordenadas usa coordenadas do mundo GTA para os locais revistos. Algumas referências continuam aproximadas e serão afinadas progressivamente. Os pontos de interesse completos (armas, colecionáveis e eventos) ainda terão de ser integrados por conjuntos de dados específicos.</div><div class="footer">O progresso fica guardado neste navegador. Projeto de fãs, não oficial nem afiliado à Rockstar Games. Mapa-base comunitário.</div></aside><div id="map" aria-label="Mapa interativo do GTA V"></div></main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script>
 const cats=[
 {id:'locais',name:'Bairros e locais',color:'#5dc8ff'},
@@ -94,14 +94,33 @@ const mapBounds=[[-3867,-5659],[8439,6680]];
 L.tileLayer('https://viruxe.github.io/gtav-map-tiles/atlas/{z}/{x}-{y}.webp',{minZoom:0,maxZoom:5,noWrap:true,bounds:mapBounds,attribution:'Mapa-base comunitário GTA V'}).addTo(map);
 // Coordenadas reais para locais de referência; os restantes pontos continuam aproximados.
 const calibrated={
-  'paleto':[-134,6356], 'paleto-forest':[-500,6000], 'mount-chiliad':[450,6000],
-  'sandy':[1850,3685], 'sandy-airfield':[1700,3500], 'grapeseed':[1700,4800],
-  'downtown':[215,-810], 'legion-square':[215,-810], 'mission-row':[425,-979], 'davis':[-48,-1757]
+  // Coordenadas do mundo GTA V (x, y); selecionadas a partir de referências públicas.
+  'vinewood-sign':[710,1200],
+  'airport':[-1035,-2735],
+  'sandy':[1850,3685],
+  'paleto':[-134,6356],
+  'grapeseed':[1700,4800],
+  'vespucci':[-1300,-1600],
+  'del-perro':[-1650,-1033],
+  'downtown':[215,-810],
+  'fort-zancudo':[-2047,3132],
+  'observatory':[-438,1076],
+  'mount-chiliad':[450.718,5566.614],
+  'paleto-forest':[-500,6000],
+  'sandy-airfield':[1700,3500],
+  'alamo-sea':[1300,3000],
+  'lighthouse': [3330,5170],
+  'humane-labs':[3500,3600],
+  'davis':[-48,-1757],
+  'mission-row':[425,-979],
+  'legion-square':[195,-935],
+  'ls-customs-airport':[-1035,-2735],
+  'ls-customs-la-mesa':[843,-1028]
 };
 const pointLatLng=p=>{
   let x,y;
   if(calibrated[p.id]){[x,y]=calibrated[p.id];}
-  else {const px=p.xy[0],py=p.xy[1];x=((px/32)-117.3)/0.02072;y=(172.8-(py/32))/0.0205;}
+  else {const px=p.xy[0],py=p.xy[1];x=(px-(117.3*32))/(0.02072*32);y=((172.8*32)-py)/(0.0205*32);}
   return [y,x];
 };
 map.fitBounds(mapBounds);
